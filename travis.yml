@@ -1,9 +1,0 @@
-dist: trusty
-sudo: false
-
-before_install:
-  - nvm use 7.4.0
-  - npm install lumo-cljs
-
-test:
-  - node_modules/.bin/lumo validate-yaml.clj
