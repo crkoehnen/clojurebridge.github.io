@@ -50,9 +50,10 @@
                                             ::sponsors
                                             ::street
                                             ::workshop_dates]))
-(defn explain [k o]
-  (s/explain k o)
-  (s/explain-str k o))
+(defn validate [k o]
+  (let [valid (s/valid? k o)]
+    (when (not valid) (s/explain k o))
+    valid))
 
 (defn read-file [f]
   (-> (.readFileSync fs f "utf8")
@@ -66,11 +67,11 @@
 (defn check-file [f]
   (->> (read-file f)
        parse-yml
-       (explain ::workshop-metadata)))
+       (validate ::workshop-metadata)))
 
 (defn read-dir [dir]
   (let [files (-> (.readdirSync fs dir "utf8") js->clj)
-        errors (keep #(check-file (str dir "/" %)) files)]
-    (js/process.exit (if (empty? errors) 0 1))))
+        valid (every? #(check-file (str dir "/" %)) files)]
+    (js/process.exit (if valid 0 1))))
 
 (read-dir "_posts")
